@@ -102,12 +102,11 @@ def _output_line_number(match):
 def _output_match(match, namespaces):
     """Return an output 'type' for a particular match result"""
     out = "?"
-
     if isinstance(match, etree._Element):
         prefixed_name = _prefixed_name_from_absolute_name(match.tag, namespaces)
         out = "<{0}>".format(prefixed_name)
 
-    elif isinstance(match, etree._ElementStringResult):
+    elif isinstance(match, etree._ElementUnicodeResult):
         if match.is_attribute:
             prefixed_name = _prefixed_name_from_absolute_name(match.attrname, namespaces)
             out = "@{0}".format(prefixed_name)

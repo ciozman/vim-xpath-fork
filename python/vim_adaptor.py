@@ -28,9 +28,7 @@ def evaluate_xpath(bufnr, winnr, xpath, ns_prefixes={}):
     loc_list = VimLocListAdaptor(bufnr, winnr)
     loc_list.clear_current_list()
     loc_list.add_text_entry("Results for: " + xpath)
-    
     xml = get_buffer_string(bufnr)
-
     try:
         results = x.evaluate(xml, xpath, ns_prefixes)
         if len(results) > 0:
@@ -45,7 +43,6 @@ def evaluate_xpath(bufnr, winnr, xpath, ns_prefixes={}):
             loc_list.add_error_entry(e.msg)
         else:
             loc_list.add_error_entry("ERROR: " + repr(e))
-
 def guess_prefixes(bufnr):
     try:
         xml = get_buffer_string(bufnr)
@@ -68,22 +65,19 @@ class VimLocListAdaptor(object):
         self.winnr = winnr
 
     def clear_current_list(self):
+        #clear the list of local variables
         vim.eval("setloclist({0}, [], 'r')".format(self.winnr))
 
     def add_result_entry(self, result):
         bufnr_arg = "'bufnr': {0}, ".format(self.bufnr)
-
         lnum_arg = ""
         if result["line_number"] is not None:
             lnum_arg = "'lnum': {0}, ".format(result["line_number"])
-
         text = result["match"]
-        if result["value"] != "":
-            val = result["value"].replace("\"", "\\\"")
+        if result["value"].decode("utf-8") != "":
+            val = result["value"].replace(b"\"", b"\\\"").decode("utf-8")
             text += ": {0}".format(val)
-
         text_arg = "'text': \"{0}\", ".format(text)
-
         vim.eval(("setloclist({0}, [{{{1}}}], 'a')"
                  ).format(self.winnr, bufnr_arg + lnum_arg + text_arg))
 

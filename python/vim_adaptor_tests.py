@@ -37,10 +37,8 @@ class VimAdaptorTests(unittest.TestCase):
     def stub_vim_buffer(self, bufnr, buffer_contents):
         a.vim.buffers[bufnr] = VimModuleBufferStub()
         a.vim.buffers[bufnr].set_contents(buffer_contents)
-
     def setUp(self):
         a.vim = VimModuleStub()
-        
     def test_buffer_mock(self):
         test_string = "test buffer contents"
         self.stub_vim_buffer(0, test_string)
@@ -58,7 +56,6 @@ class VimAdaptorTests(unittest.TestCase):
                          "//Tag\"" +
                          "}], 'a')",
                          VimModuleStub.evaluated[1])
-        
         self.assertEqual("setloclist(0, [{" +
                          "'bufnr': 1, " +
                          "'lnum': 2, " +
@@ -92,7 +89,6 @@ class VimAdaptorTests(unittest.TestCase):
         self.stub_vim_buffer(0, text_xml)
 
         a.evaluate_xpath(1, 0, "'test string'")
-
         self.assertEqual("setloclist(0, [{" +
                          "'bufnr': 1, " +
                          "'text': \"string: test string\", " +
@@ -143,3 +139,8 @@ class VimAdaptorTests(unittest.TestCase):
                          "'text': \"<Tag>: \\\"and some quotes\\\"\", " +
                          "}], 'a')",
                          VimModuleStub.evaluated[3])
+if __name__ == "__main__":
+
+    x = VimAdaptorTests()
+    x.setUp()
+    x.test_xpath_which_doesnt_return_a_line_number()

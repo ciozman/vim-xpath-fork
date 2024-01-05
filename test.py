@@ -2,11 +2,12 @@ import sys
 
 
 import nose
-
 import re
 import glob
 import subprocess
 
+import collections.abc
+collections.Callable= collections.abc.Callable
 SEGV_RETRIES = 10
 class VSpecSEGVException(Exception):
     pass
@@ -16,9 +17,9 @@ def run_python_tests():
     python_success = nose.run(testLoader=loader)
 
     if (python_success):
-        print 'All python tests passed'
+        print ('All python tests passed')
     else:
-        print 'Python tests failed'
+        print ('Python tests failed')
 
     return python_success
 
@@ -29,6 +30,7 @@ def run_vspec_tests():
     total_run = 0
 
     for name in glob.glob('tests/**.vim'):
+        print (name)
         cmd = ['./deps/vim-vspec/bin/vspec',
                './deps/vim-vspec', '.',
                name]
@@ -36,29 +38,28 @@ def run_vspec_tests():
         try:
             output = subprocess.check_output(cmd)
         except Exception as e:
-            print e
+            print (e)
             raise
-
         for line in output.split('\n'):
             if "SEGV" in line:
                 raise VSpecSEGVException("Eek.")
 
         passed, run = get_vspec_pass_fail(output)
         output = format_vspec_output(output)
-        print output
+        print (output)
 
         if run != '?':
             total_passed += int(passed)
             total_run += int(run)
 
-    print
+    print ()
 
     if total_passed == total_run:
         vim_success = True
-        print 'All {0} vspec tests passed'.format(total_passed)
+        print ('All {0} vspec tests passed').format(total_passed)
     else:
         failed = total_run - total_passed
-        print '{0} of {1} vspec tests failed'.format(failed, total_run)
+        print ('{0} of {1} vspec tests failed').format(failed, total_run)
 
     return vim_success
 
@@ -92,13 +93,13 @@ def get_vspec_pass_fail(output):
     return passed, total
 
 if __name__ == '__main__':
-    print "Running python tests:"
-    print
+    print ("Running python tests:")
+    print ()
     python_success = run_python_tests()
 
-    print
-    print "Running vspec tests:"
-    print 
+    print ()
+    print ("Running vspec tests:")
+    print ()
 
     vspec_success = False
     for i in range(SEGV_RETRIES):
@@ -106,9 +107,9 @@ if __name__ == '__main__':
             vspec_success = run_vspec_tests()
             break
         except VSpecSEGVException as e:
-            print "SEGV error from vspec, retrying :/"
+            print ("SEGV error from vspec, retrying :/")
 
-    print "-------------------------------"
+    print ("-------------------------------")
 
     if (not python_success and not vspec_success):
         sys.exit("Python and vspec tests failed")
